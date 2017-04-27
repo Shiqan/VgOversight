@@ -1,0 +1,388 @@
+{% extends 'layout.html' %}
+{% set light = true %}
+{% block title %} Profile {% endblock %}
+{% block head %}
+<style>
+    #external-profiles img {
+        width: auto;
+        height: 24px;
+    }
+
+    .avatar {
+        border: 0;
+    }
+
+    .text-name {
+        display: block;
+        margin-top: 10px;
+        font-weight: 300;
+        color: #777;
+        font-size: 20px;
+    }
+
+    h4 button.mfp-close {
+        background-color: black;
+        font-size: 21px;
+    }
+
+
+		span.twitter-typeahead { display: block !important; }
+
+		.tt-menu {
+			width: 100%;
+			margin: 4px 0;
+			padding: 8px 0;
+			background-color: #FFF;
+			border: 1px solid rgba(0, 0, 0, 0.2);
+			-webkit-border-radius: 4px;
+			 -moz-border-radius: 4px;
+				  border-radius: 4px;
+			-webkit-box-shadow: 0 1px 10px rgba(0,0,0,.1);
+			 -moz-box-shadow: 0 1px 10px rgba(0,0,0,.1);
+				  box-shadow: 0 1px 10px rgba(0,0,0,.1);
+
+		}
+
+		.tt-suggestion {
+			padding: 3px 20px;
+			font-size: 15px;
+			line-height: 24px;
+		}
+
+		.tt-suggestion:hover {
+			cursor: pointer;
+			color: #FFF;
+			background-color: #0097cf;
+		}
+
+		.tt-suggestion.tt-cursor {
+			color: #fff;
+			background-color: #0097cf;
+
+		}
+
+</style>
+{% endblock %}
+{% block content %}
+<!-- Content
+============================================= -->
+<section id="content">
+
+    <div class="content-wrap">
+
+        <div class="container clearfix">
+
+            <div class="row clearfix">
+
+                <div class="col-sm-9">
+
+                    <img src="/static/img/skilltiers/{{current_user.skillTier}}.png"
+                         class="avatar alignleft img-circle img-thumbnail notopmargin nobottommargin" alt="Avatar"
+                         style="max-width: 84px;">
+
+                    <div class="heading-block noborder">
+                        <h3> {{ current_user }} </h3>
+                        <span> {{ current_user.id }} </span>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="row clearfix">
+
+                        <div class="col-md-12">
+                            <div class="col-sm-6">
+                                <div class="heading-block topmargin-sm">
+                                    <h2> Team </h2>
+                                </div>
+                                {% if current_user.team %}
+                                <a href="/team/{{current_user.team.id}}/">
+                                    <img src="/static/img/skilltiers/{{current_user.team.skillTier}}.png"
+                                         class="avatar alignleft img-circle img-thumbnail notopmargin nobottommargin"
+                                         alt="Avatar" style="max-width: 84px;">
+                                    <span class="text-name"> <strong>{{ current_user.team.name }}</strong> <br> {{ current_user.team.tag }} </span>
+                                </a>
+                                {% else %}
+                                <a href="#joinTeam" class="button button-3d button-large" data-lightbox="inline">Join
+                                    Team</a>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="heading-block topmargin-sm">
+                                    <h2> Guild </h2>
+                                </div>
+                                {% if current_user.guild %}
+                                <a href="/guild/{{current_user.guild.id}}/">
+                                    <img src="/static/img/skilltiers/{{current_user.guild.skillTier}}.png"
+                                         class="avatar alignleft img-circle img-thumbnail notopmargin nobottommargin"
+                                         alt="Avatar" style="max-width: 84px;">
+                                    <span class="text-name"> <strong>{{ current_user.guild.name }}</strong> <br> {{ current_user.guild.tag }} </span>
+                                </a>
+                                {% else %}
+                                <a href="#joinGuild" class="button button-3d button-large" data-lightbox="inline">Join
+                                    Guild</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="line visible-xs-block"></div>
+
+                <div class="col-sm-3 clearfix">
+
+                    <div id="external-profiles" class="list-group">
+                        <a href="http://vgpro.gg/players/{{current_user.shardId}}/{{current_user}}" target="_blank" class="list-group-item clearfix">Vgpro.gg <img src="http://vgpro.gg/assets/images/logo_smaller.png" class="pull-right"/> </a>
+                        <a href="http://vain.gg/{{current_user.shardId}}/{{current_user}}" target="_blank" class="list-group-item clearfix">Vain.gg <img src="http://images.vain.gg/images/logo/nav-logo.png" class="pull-right"/></a>
+                        <a href="http://www.vgminer.com/DataMine/PlayerData?playerName={{current_player}}&region={{current_user.shardId}}" target="_blank" class="list-group-item clearfix">VgMiner <img src="https://pbs.twimg.com/profile_images/855079047881162752/f0l_CSBH_400x400.jpg" class="pull-right"/> </a>
+                        <a href="https://vainsocial.com/player/{{current_user}}" target="_blank" class="list-group-item clearfix">VainSocial <img src="https://pbs.twimg.com/profile_images/838757996054208514/3Fic1_R8_400x400.jpg" class="pull-right"/> </a>
+                        <a href="https://mastervainglory.com/profile/{{current_user.shardId}}/{{current_user.id}}" target="_blank" class="list-group-item clearfix">Master Vainglory <img src="https://mastervainglory.com/asset/image/logo-mini-light.png" class="pull-right"/></a>
+                        <a href="http://vgu.herokuapp.com/analysis.html?ign={{current_user}}&shard={{current_user.shardId}}&submit=" target="_blank" class="list-group-item clearfix">Vainglory University <img src="http://vgu.herokuapp.com/images/vgu-logo-large.png" class="pull-right"/></a>
+                    </div>
+
+                    <div class="fancy-title topmargin title-border">
+                        <h4>Update Stats</h4>
+                    </div>
+                    <form action="#" id="update-player-form" name="update-player-form" class="clearfix"
+                          style="display: none;">
+                        <input type="text" name="player_id" value="{{player.id}}" hidden/>
+                    </form>
+                    <button id="update-player-stats" type="button"
+                            class="button button-rounded button-small button-dark nomargin" value="submit">Update
+                    </button>
+                    <button id="update-player-stats-wait" type="button"
+                            class="button button-3d button-black nomargin button-loading" style="display: none;"><i
+                            class="icon-repeat"></i> Loading
+                    </button>
+                    <div id="update-player-stats-success" class="alert alert-success" style="display: none;">
+                        <strong>Thank You.</strong> You updated the stats succesfully!
+                    </div>
+                    <div id="update-player-stats-error" class="alert alert-danger" style="display: none;">
+                        <strong>Sorry.</strong> Something went wrong, please try again another time!
+                    </div>
+
+
+                    <div class="fancy-title topmargin title-border">
+                        <h4>Recent Games</h4>
+                    </div>
+
+                    {% for game in current_user.participated[:5] %}
+                    <a href="/match/{{game.roster.match.id}}/"
+                       class="social-icon {% if game.winner %}si-spotify{% else %}si-youtube{% endif %} si-small si-rounded si-colored"
+                       title="Facebook">
+                        <i class="icon-circle"></i>
+                        <i class="icon-circle"></i>
+                    </a>
+                    {% endfor %}
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section><!-- #content end -->
+
+<!-- Modal -->
+<div class="modal1 mfp-hide" id="joinGuild">
+    <div class="block divcenter" style="background-color: #FFF; max-width: 700px;">
+        <div class="row nomargin clearfix">
+            <div class="col-sm-6" data-height-lg="456" data-height-md="456" data-height-sm="456" data-height-xs="0"
+                 data-height-xxs="0"
+                 style="background-image: url('/static/images/theacadamy_by_noxiihunter-d86aems.jpg'); background-size: cover;"></div>
+            <div class="col-sm-6 col-padding" data-height-lg="456" data-height-md="456" data-height-sm="456"
+                 data-height-xs="456" data-height-xxs="456">
+                <div>
+                    <h4 class="uppercase ls1">Join Guild
+                        <button title="Close (Esc)" type="button" class="mfp-close" aria-hidden="true">×</button>
+                    </h4>
+
+                    <form action="#" id="subscribe-form-guild" name="subscribe-form" class="clearfix"
+                          style="max-width: 300px;">
+                        <div class="col_full">
+                            <input id="typeaheadGuilds" type="text" name="subscribe-form-name" value=""
+                                   class="sm-form-control"/>
+                            <input type="text" name="subscribe-form-type" value="guild" hidden/>
+                        </div>
+                        <div class="col_full nobottommargin">
+                            <button id="subscribe-form-guild-submit" type="button"
+                                    class="button button-rounded button-small button-dark nomargin" value="submit">Join
+                            </button>
+                            <button type="button" class="button button-3d button-black nomargin button-loading"
+                                    id="subscribe-form-team-guild-wait" style="display: none;"><i
+                                    class="icon-repeat"></i> Loading
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal1 mfp-hide" id="joinTeam">
+    <div class="block divcenter" style="background-color: #FFF; max-width: 700px;">
+        <div class="row nomargin clearfix">
+            <div class="col-sm-6" data-height-lg="456" data-height-md="456" data-height-sm="456" data-height-xs="0"
+                 data-height-xxs="0"
+                 style="background-image: url('/static/images/halcyon_lore_by_noxiihunter-dam827l.jpg'); background-size: cover;"></div>
+            <div class="col-sm-6 col-padding" data-height-lg="456" data-height-md="456" data-height-sm="456"
+                 data-height-xs="456" data-height-xxs="456">
+                <div>
+                    <h4 class="uppercase ls1">Join Team
+                        <button title="Close (Esc)" type="button" class="mfp-close" aria-hidden="true">×</button>
+                    </h4>
+                    <form action="#" id="subscribe-form-team" name="subscribe-form" class="clearfix"
+                          style="max-width: 300px;">
+                        <div class="col_full">
+                            <input id="typeaheadTeams" type="text" name="subscribe-form-name" value=""
+                                   class="sm-form-control"/>
+                            <input type="text" name="subscribe-form-type" value="team" hidden/>
+                        </div>
+                        <div class="col_full nobottommargin">
+                            <button id="subscribe-form-team-submit" type="button"
+                                    class="button button-rounded button-small button-dark nomargin" value="submit">Join
+                            </button>
+                            <button type="button" class="button button-3d button-black nomargin button-loading"
+                                    id="subscribe-form-team-team-wait" style="display: none;"><i
+                                    class="icon-repeat"></i> Loading
+                            </button>
+                        </div>
+
+                        <div id="subscribe-form-team-msg" class="col_full nobottommargin"></div>
+                    </form>
+                    <p class="nobottommargin"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="/static/js/typehead.js"></script>
+<script>
+var substringMatcher = function(strs) {
+    return function findMatches(q, cb) {
+    var matches, substringRegex;
+
+    // an array that will be populated with substring matches
+    matches = [];
+
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        matches.push(str);
+      }
+    });
+
+    cb(matches);
+    };
+};
+
+var guilds = [ {% for guild in guilds %} "{{ guild }}" {% if not loop.last %},{% endif%} {% endfor %}];
+var teams = [ {% for team in teams %} "{{ team }}" {% if not loop.last %},{% endif%} {% endfor %}];
+
+$('#typeaheadTeams').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1
+},
+{
+    name: 'teams',
+    source: substringMatcher(teams)
+});
+
+$('#typeaheadGuilds').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1
+},
+{
+    name: 'guilds',
+    source: substringMatcher(guilds)
+});
+
+
+$(function() {
+    $('#subscribe-form-team-submit').click(function() {
+    	$("#subscribe-form-team-submit").hide();
+    	$("#subscribe-form-submit-team-wait").show();
+		$("#subscribe-form-team-msg").hide();
+        $.ajax({
+            url: '/ajax_join_group/',
+            data: $('#subscribe-form-team').serialize(),
+            type: 'POST',
+            success: function(response) {
+            	error = response['error'];
+            	console.log(error);
+            	if (error) {
+            		$("#subscribe-form-team-msg").html('<strong> Sorry. </strong>' + error);
+            		$("#subscribe-form-team-msg").slideDown();
+            	} else {
+                	location.reload();
+                }
+                $("#subscribe-form-submit").show();
+    			$("#subscribe-form-submit-wait").hide();
+            },
+            error: function(error) {
+                $("#subscribe-form-team-msg").html("<strong> Sorry. </strong> Something went wrong, please try again another time!").slideDown();
+            }
+        });
+    });
+
+    $('#subscribe-form-guild-submit').click(function() {
+    	$("#subscribe-form-guild-submit").hide();
+    	$("#subscribe-form-submit-guild-wait").show();
+		$("#subscribe-form-guild-msg").hide();
+        $.ajax({
+            url: '/ajax_join_group/',
+            data: $('#subscribe-form-guild').serialize(),
+            type: 'POST',
+            success: function(response) {
+            	error = response['error'];
+            	console.log(error);
+            	if (error) {
+            		$("#subscribe-form-guild-msg").html('<strong> Sorry. </strong>' + error);
+            		$("#subscribe-form-guild-msg").slideDown();
+            	} else {
+                	location.reload();
+                }
+                $("#subscribe-form-submit").show();
+    			$("#subscribe-form-submit-wait").hide();
+            },
+            error: function(error) {
+                $("#subscribe-form-guild-msg").html("<strong> Sorry. </strong> Something went wrong, please try again another time!").slideDown();
+            }
+        });
+    });
+
+     $('#update-player-stats').click(function() {
+        $("#update-player-stats").hide();
+        $("#update-player-stats-wait").show();
+
+        $.ajax({
+            url: '/ajax_update_player/',
+            data: $('#update-player-form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                $("#update-player-stats-success").slideDown();
+                $("#update-player-stats-wait").hide();
+            },
+            error: function(error) {
+                $("#update-player-stats-error").slideDown();
+                $("#update-player-stats-wait").hide();
+            }
+        });
+    });
+});
+
+
+</script>
+{% endblock %}

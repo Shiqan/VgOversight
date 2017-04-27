@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+{% block title %} Index {% endblock %}
+{% block header %}
+<!-- Header
+============================================= -->
+<header id="header" class="no-sticky transparent-header dark">
+
+    <div id="header-wrap">
+
+        <div class="container clearfix">
+
+            <!-- Logo
+            ============================================= -->
+            <div id="logo">
+                <a href="/index/" class="standard-logo" data-dark-logo="/static/img/logo-dark.png"><img
+                        src="/static/img/logo.png" alt="Canvas Logo"></a>
+            </div><!-- #logo end -->
+
+            <div class="fright dark hidden-sm hidden-xs clearfix" style="margin-top: 30px;">
+
+                <a href="/profile" class="social-icon si-light">
+                    <i class="icon-user"></i>
+                    <i class="icon-user" style="background: #1ABC9C;"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header><!-- #header end -->
+{% endblock %}
+{% block content %}
+<!-- Content
+============================================= -->
+<section id="slider" class="full-screen dark"
+         style="background: url('/static/images/mcZaXyU.jpg') center;  background-size: cover;">
+
+    <div class="container clearfix vertical-middle">
+
+        <div class="heading-block title-center nobottomborder">
+            <h1>We are currently Under Construction</h1>
+            <span>Please check back again within Some Days as We're Pretty Close</span>
+        </div>
+
+        <div id="countdown-ex1" class="countdown countdown-large coming-soon divcenter bottommargin"
+             style="max-width:700px;"></div>
+
+        <div class="divider divider-center divider-short divider-margin"><i class="icon-time"></i></div>
+
+    </div>
+
+</section>
+{% endblock %}
+
+{% block js %}
+<script>
+jQuery(document).ready( function($){
+	var newDate = new Date("05/19/2017");
+	$('#countdown-ex1').countdown({until: newDate});
+});
+
+</script>
+{% endblock %}

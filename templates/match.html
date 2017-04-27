@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+{% set light = true %}
+{% set disable_transparent_header = true %}
+{% block title %} Match {% endblock %}
+{% block content %}
+<!-- Page Title
+============================================= -->
+<section id="page-title" class="page-title-parallax page-title-dark"
+         style="background-image: url('/static/img/bg-academy.jpg'); background-size: cover; padding: 120px 0;"
+         data-stellar-background-ratio="0.3">
+
+    <div class="container clearfix">
+        <h1>Match</h1>
+        <span>{{ match.id }}</span>
+    </div>
+
+</section>
+
+<!-- Content
+============================================= -->
+<section id="content">
+
+    <div class="content-wrap">
+
+        <div class="container clearfix">
+
+            <div id="overview" class="row">
+                <div class="heading-block">
+                    <h2>Overview</h2>
+                    {{ match.duration }}
+                    {{ match.createdAt }}
+                    {{ match.gameMode }}
+                    {{ match.endGameReason }}
+                </div>
+            </div>
+
+            <div id="members" class="row">
+                <div class="heading-block">
+                    <h2>Members</h2>
+                </div>
+                {% for hero, p in match.left.heroes %}
+                <img src="/static/img/heroes/{{hero | hero_to_img }}" class="img-circle" data-toggle="tooltip"
+                     title="{{p}}" width="40px;"/>
+                {% endfor %}
+                {% for hero, p in match.right.heroes %}
+                <img src="/static/img/heroes/{{hero | hero_to_img }}" class="img-circle" data-toggle="tooltip"
+                     title="{{p}}" width="40px;"/>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    </div>
+
+</section><!-- #content end -->
+{% endblock %}

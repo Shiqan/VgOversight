@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+{% block title %} {% endblock %}
+
+{% block content %}
+
+<section id="slider" class="full-screen slider-parallax">
+    <div class="slider-parallax-inner" style="background: url('/static/images/krull_teaser_by_carlo_arellano-d83fsec.gif') center center no-repeat; background-size: cover;">
+        <div class="vertical-middle" style="z-index: 2;">
+            <div class="container dark clearfix">
+                <div class="row clearfix">
+                    <div class="col-md-6 col-sm-8">
+                        <div class="emphasis-title">
+                            <h1 class="font-body">Beautiful Websites.<br>Increased Conversions.</h1>
+                            <a href="#" data-scrollto="#content" class="button button-3d button-small button-rounded">Get Started</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="video-wrap" style="position: absolute; height: 100%; z-index: 1;">
+            <div class="video-overlay" style="background: rgba(0,0,0,0.2);"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Content
+============================================= -->
+<section id="content">
+
+    <div class="content-wrap">
+        <div class="container clearfix">
+            <div class="row clearfix">
+
+                <div class="col_full">
+                    <div class="heading-block topmargin">
+                        <h1>Sign up</h1>
+                    </div>
+
+                    <form id="subscribe-form" name="subscribe-form" class="nobottommargin" action="#" method="post">
+                        <div class="col_full">
+                            <label for="subscribe-form-type">Guild / Team:</label>
+                            <select id="subscribe-form-type" name="subscribe-form-type" class="selectpicker form-control">
+                                <option value="guild">Guild</option>
+                                <option value="team">Team</option>
+                            </select>
+                        </div>
+
+                        <div class="col_full">
+                            <label for="subscribe-form-tag">Tag:</label>
+                            <input type="text" id="subscribe-form-tag" name="subscribe-form-tag" value="" class="form-control">
+                        </div>
+
+                        <div class="col_full">
+                            <label for="subscribe-form-name">Name:</label>
+                            <input type="text" id="subscribe-form-name" name="subscribe-form-name" value="" class="form-control">
+                        </div>
+
+                        <div class="col_full">
+                            <label for="subscribe-form-description">Description:</label>
+                            <textarea class="required sm-form-control" id="subscribe-form-description" name="subscribe-form-description" rows="6" cols="10"></textarea>
+                        </div>
+
+                        <div class="col_full">
+                            <label for="subscribe-form-region">Region:</label>
+                            <select id="subscribe-form-region" name="subscribe-form-region" class="selectpicker form-control">
+                                <option value="eu">Europe</option>
+                                <option value="na">North America</option>
+                                <option value="sa">South America</option>
+                                <option value="ea">East Asia</option>
+                                <option value="sea">South East Asia</option>
+                            </select>
+                        </div>
+
+                        <div class="col_full nobottommargin">
+                            <button type="button" class="button button-3d button-black nomargin" id="subscribe-form-submit" name="subscribe-form-submit">Sign Up </button>
+                            <button type="button" class="button button-3d button-black nomargin button-loading" id="subscribe-form-submit-wait" style="display: none;"><i class="icon-repeat"></i> Loading </button>
+                        </div>
+                    </form>
+                    <br>
+                    <div id="subscribe-form-success" class="alert alert-success" style="display: none;">
+                        <strong>Thank You.</strong> You signed up succesfully!
+                    </div>
+
+                    <div id="subscribe-form-error" class="alert alert-danger" style="display: none;">
+
+                    </div>
+
+                    <div id="subscribe-form-fail" class="alert alert-danger" style="display: none;">
+                        <strong>Sorry.</strong> Something went wrong, please try again another time!
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section><!-- #content end -->
+{% endblock %}
+
+{% block js %}
+<script>
+$(function() {
+    $('#subscribe-form-submit').click(function() {
+    	$("#subscribe-form-submit").hide();
+    	$("#subscribe-form-submit-wait").show();
+		$("#subscribe-form-fail, #subscribe-form-success, #subscribe-form-error").hide();
+        $.ajax({
+            url: '/ajax_signup/',
+            data: $('#subscribe-form').serialize(),
+            type: 'POST',
+            success: function(response) {
+            	error = response['error'];
+            	console.log(error);
+            	if (error) {
+            		$("#subscribe-form-error").html('<strong> Sorry. </strong>' + error);
+            		$("#subscribe-form-error").slideDown();
+            	} else {
+                	$("#subscribe-form-success").slideDown();
+                	$('#subscribe-form').trigger("reset");
+                }
+                $("#subscribe-form-submit").show();
+    			$("#subscribe-form-submit-wait").hide();
+            },
+            error: function(error) {
+                $("#subscribe-form-fail").slideDown();
+            }
+        });
+    });
+});
+
+</script>
+{% endblock %}

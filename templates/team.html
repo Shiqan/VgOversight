@@ -1,0 +1,246 @@
+{% extends 'layout.html' %}
+{% set light = true %}
+{% block title %} {{ team }} {% endblock %}
+{% block head %}
+<!-- Bootstrap Data Table Plugin -->
+<link rel="stylesheet" href="/static/css/bs-datatable.css" type="text/css"/>
+<style>
+.match_result_win {
+    border-left: 4px solid #d6e9c6 !important;
+}
+.match_result_lost {
+    border-left: 4px solid #ebccd1 !important;
+}
+
+#member_datatable tbody tr, #match_datatable tbody tr {
+    cursor: pointer;
+}
+
+
+</style>
+{% endblock %}
+{% block content %}
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+    <div class="container clearfix">
+        <div class="row">
+            <div class="col-md-6">
+                <h1> {{ team }}</h1>
+                <span>{{ team.tag }} </span>
+            </div>
+            <div class="col-md-6">
+                <img class="pull-right" src="/static/img/skilltiers/{{team.skillTier}}.png" alt="Average skilltier"
+                     width="100px"/>
+            </div>
+        </div>
+    </div>
+
+</section><!-- #page-title end -->
+
+<!-- Page Sub Menu
+============================================= -->
+<div id="page-menu">
+
+    <div id="page-menu-wrap">
+
+        <div class="container clearfix">
+
+            <div class="menu-title"><span> {{ team.tag }} </span></div>
+
+            <nav>
+                <ul id="submenu">
+                    <li class="current"><a href="#" data-scrollto="#overview">
+                        <div>Overview</div>
+                    </a></li>
+                    <li><a href="#" data-scrollto="#members">
+                        <div>Members</div>
+                    </a></li>
+                    <li><a href="#" data-scrollto="#matches">
+                        <div>Matches</div>
+                    </a></li>
+                </ul>
+            </nav>
+
+            <div id="page-submenu-trigger"><i class="icon-reorder"></i></div>
+
+        </div>
+
+    </div>
+
+</div><!-- #page-menu end -->
+
+<!-- Content
+============================================= -->
+<section id="content">
+
+    <div class="content-wrap">
+
+        <div class="container clearfix">
+
+            <div id="overview" class="row">
+                <div class="heading-block">
+                    <h2>Overview</h2>
+                </div>
+
+
+                <div class="col-md-3 col-sm-6 nobottommargin">
+                    <div class="feature-box fbox-center fbox-effect">
+                        <div class="fbox-icon">
+                            <a> <i>{{ team._matches | count }}</i></a>
+                        </div>
+                        <h3>Matches played</h3>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 nobottommargin">
+                    <div class="feature-box fbox-center fbox-effect">
+                        <div class="fbox-icon">
+                            <a> <i>{{ '%0.2f'| format(team.winrate) }}%</i></a>
+                        </div>
+                        <h3>Winrate</h3>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 nobottommargin">
+                    <div class="feature-box fbox-center fbox-effect ">
+                        <div class="fbox-icon">
+                            <a> <i>{{ team.duration | convert_game_time }}</i></a>
+                        </div>
+                        <h3>Duration</h3>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 nobottommargin">
+                    <div class="feature-box fbox-center fbox-effect">
+                        <div class="fbox-icon">
+                            <a> <i>{{ team._members | count }}</i></a>
+                        </div>
+                        <h3>Members</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div id="members" class="row">
+                <div class="heading-block">
+                    <h2>Members</h2>
+                </div>
+                <table id="member_datatable" class="table table-hover table-striped" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Skill tier</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for member in team._members %}
+                    <tr data-url="/profile/{{member.id}}/">
+                        <td> {{ member }}</td>
+                        <td><span class="skilltier"> {{member.skillTier}} </span><img class="pull-right"
+                                                                                      src="/static/img/skilltiers/{{member.skillTier}}.png"
+                                                                                      alt="Member's skilltier"
+                                                                                      width="25px"/></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div id="matches" class="row">
+                <div class="heading-block">
+                    <h2>Matches</h2>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="match_datatable" class="table table-hover table-striped table-bordered" cellspacing="0"
+                           width="100%">
+                        <thead>
+                        <tr>
+                            <th>Left side</th>
+                            <th>Right side</th>
+                            <th>Duration</th>
+                            <th>Date</th>
+                            <th>Mode</th>
+                            <th>Match id</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for roster in team._matches %}
+                        <tr data-url="/match/{{roster.match.id}}/">
+                            <td class="{% if roster.winner %}match_result_win{% else %}match_result_lost{% endif %}">
+                                {% for hero, p in roster.match.left.heroes %}
+                                <img src="/static/img/heroes/{{hero | hero_to_img }}" class="img-circle"
+                                     data-toggle="tooltip" title="{{p}}" width="40px;"/>
+                                {% endfor %}
+                                {% if roster.match.left.team_id %} <span class="label label-info"
+                                                                         style="text-decoration: underline overline;">{{ roster.match.left.team_id | convert_team_id }}</span>
+                                {% endif %}
+                                {% if roster.match.left.guild_id %} <span class="label label-primary">[{{ roster.match.left.guild_id | convert_guild_id}}]</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% for hero, p in roster.match.right.heroes %}
+                                <img src="/static/img/heroes/{{hero | hero_to_img }}" class="img-circle"
+                                     data-toggle="tooltip" title="{{p}}" width="40px;"/>
+                                {% endfor %}
+                                {% if roster.match.right.team_id %} <span class="label label-info"
+                                                                          style="text-decoration: underline overline;">{{ roster.match.right.team_id | convert_team_id }}</span>
+                                {% endif %}
+                                {% if roster.match.right.guild_id %} <span class="label label-primary">[{{ roster.match.right.guild_id | convert_guild_id}}]</span>
+                                {% endif %}
+                            </td>
+                            <td> {{ roster.match.duration | convert_game_time }}</td>
+                            <td> {{ roster.match.createdAt }}</td>
+                            <td> {{ roster.match.queue }}</td>
+                            <td> {{ roster.match.id }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section><!-- #content end -->
+{% endblock %}
+
+{% block js %}
+<!-- Bootstrap Data Table Plugin -->
+<script type="text/javascript" src="/static/js/bs-datatable.js"></script>
+
+<script>
+$(function() {
+    $(document).on("scroll", onScroll);
+
+    $('#member_datatable').dataTable();
+    $('#match_datatable').dataTable({
+		"order": [[ 3, "desc" ]]
+    });
+
+    $("#match_datatable tbody tr, #member_datatable tbody tr").click(function() {
+		window.location.href = $(this).data( "url" );
+	});
+});
+
+function onScroll(event){
+    var scrollPos = $(document).scrollTop();
+    $('#submenu a').each(function () {
+        var currLink = $(this);
+        var refElement = $(currLink.data("scrollto"));
+        if (refElement.position().top <= scrollPos && refElement.position().top + refElement.height() > scrollPos) {
+            $('#submenu li').removeClass("current");
+            currLink.parent().addClass("current");
+        }
+        else{
+            currLink.removeClass("current");
+        }
+    });
+}
+
+</script>
+{% endblock %}
