@@ -6,12 +6,7 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
-        username="shiqan",
-        password="plaintextpasswordftw",
-        hostname="shiqan.mysql.pythonanywhere-services.com",
-        databasename="shiqan$vainglory",
-    )
+    SQLALCHEMY_DATABASE_URI = "postgres://poofkjsspeyigb:2ba845148050fd1119d928e40178d69b0e7a627d1ee5d26f2219d42416362df1@ec2-54-228-235-185.eu-west-1.compute.amazonaws.com:5432/d9vilu9trlu64l"
 
 
 class DevelopmentConfig(Config):
