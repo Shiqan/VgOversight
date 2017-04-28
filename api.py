@@ -17,7 +17,6 @@ class VaingloryApi(object):
         response = requests.get(self.url + "{0}/{1}".format(region, endpoint),
                                 headers=headers,
                                 params=params)
-        print(response.text)
         response.raise_for_status()
         return response.json()
 

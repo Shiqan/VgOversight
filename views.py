@@ -131,10 +131,10 @@ def ajax_update_player():
     if not player:
         abort(404)
 
-    print("-- Start casual")
-    result = request_data.process_id(player_id, "casual")
-    process_data.process_batch_query(result)
-    print("-- Finished casual")
+    # print("-- Start casual")
+    # result = request_data.process_id(player_id, "casual")
+    # process_data.process_batch_query(result)
+    # print("-- Finished casual")
 
     print("-- Start ranked")
     result = request_data.process_id(player_id, "ranked")
