@@ -131,11 +131,15 @@ def ajax_update_player():
     if not player:
         abort(404)
 
+    print("-- Start casual")
     result = request_data.process_id(player_id, "casual")
     process_data.process_batch_query(result)
+    print("-- Finished casual")
 
+    print("-- Start ranked")
     result = request_data.process_id(player_id, "ranked")
     process_data.process_batch_query(result)
+    print("-- Finished ranked")
     return jsonify({'status': 200})
 
 
@@ -224,19 +228,58 @@ def match(match_id):
     return render_template('match.html', match=match)
 
 
-@app.route('/test/<string:gamemode>/')
-def test(gamemode):
-    teams = db.session.query(Team).all()
-    player_ids = [member.id for team in teams for member in team._members]
-    chunks = [player_ids[x:x + 10] for x in range(0, len(player_ids), 10)]
-    for chunk in chunks:
-        request_data.threaded_process_range(2, chunk, gamemode)
-        print("time.sleep(60)")
-        time.sleep(60)
+@app.route('/debug/')
+def test():
+    # teams = db.session.query(Team).all()
+    # player_ids = [member.id for team in teams for member in team._members]
+    # chunks = [player_ids[x:x + 10] for x in range(0, len(player_ids), 10)]
+    # for chunk in chunks:
+    #     request_data.threaded_process_range(2, chunk, gamemode)
+    #     print("time.sleep(60)")
+    #     time.sleep(60)
 
     # request_data.query_team("cca544dd-8fb9-4640-97fa-d20aee017639")
 
-    # guild_id = "a6b00cdc-66af-48ab-87ce-defbe397c60f"
+    team = db.session.query(Guild).filter_by(tag="FT").one()
+    db.session.delete(team)
+
+    print("Query #1" + time.strftime("%Y-%m-%dT%H:%M%SZ"))
+    player = request_data.query_player("DaZac", "eu")
+    add_player = Player(id=player['id'], name=player['attributes']['name'], shardId="eu",
+                        lifetimeGold=player['attributes']['stats']['lifetimeGold'],
+                        lossStreak=player['attributes']['stats']['lossStreak'],
+                        winStreak=player['attributes']['stats']['winStreak'],
+                        played=player['attributes']['stats']['played'],
+                        played_ranked=player['attributes']['stats']['played_ranked'],
+                        wins=player['attributes']['stats']['wins'],
+                        xp=player['attributes']['stats']['xp'])
+    add_player.team_id = test.id
+    try:
+        db.session.add(add_player)
+        db.session.commit()
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
+
+    print("Query #2" + time.strftime("%Y-%m-%dT%H:%M%SZ"))
+    player = request_data.query_player("Nyria", "eu")
+    add_player = Player(id=player['id'], name=player['attributes']['name'], shardId="eu",
+                        lifetimeGold=player['attributes']['stats']['lifetimeGold'],
+                        lossStreak=player['attributes']['stats']['lossStreak'],
+                        winStreak=player['attributes']['stats']['winStreak'],
+                        played=player['attributes']['stats']['played'],
+                        played_ranked=player['attributes']['stats']['played_ranked'],
+                        wins=player['attributes']['stats']['wins'],
+                        xp=player['attributes']['stats']['xp'])
+    add_player.team_id = test.id
+    try:
+        db.session.add(add_player)
+        db.session.commit()
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
+
+    # guild_id = db.session.query(Guild).filter_by(tag="FT").one()
     # guild =  ["DaZac", "Nyria", "MarcoNewgate", "sugab", "farizhakim", "Kootiz", "Conchobhar", "XardaS",
     #           "XSM1X", "WestSideTK", "R3zA", "krelian", "iTsKerim", "standart", "loyalkiller", "StormNeos", "time2party",
     #           "salkoamok", "KanonMara", "GeTR3kT1337", "snowGhost", "TheBigBadWolf95", "shanlom", "MaestroTg",
@@ -245,7 +288,7 @@ def test(gamemode):
     # for member in guild:
     #     player = db.session.query(Player).filter_by(name=member).first()
     #     if player:
-    #         player.guild_id = guild_id
+    #         player.guild_id = guild_id.id
     #         try:
     #             db.session.commit()
     #         except SQLAlchemyError as e:
