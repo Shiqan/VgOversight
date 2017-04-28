@@ -8,7 +8,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.ProductionConfig')
 
 # app.config.from_object('config.ProductionConfig')
 # app.config.from_envvar('YOURAPPLICATION_SETTINGS  ')
