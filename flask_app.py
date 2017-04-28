@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_login import LoginManager
-from flask_sqlalchemy import 
+from flask_sqlalchemy import SQLAlchemy
 import os
 
 appname = "Vainglorious Meta"
