@@ -110,7 +110,7 @@ def profile():
     return render_template('profile.html', player=player, teams=teams, guilds=guilds)
 
 
-@app.route('/profile/<uuid:player_id>/', methods=['GET'])
+@app.route('/profile/<string:player_id>/', methods=['GET'])
 def public_profile(player_id):
     player = db.session.query(Player).get(player_id)
     team = None
@@ -202,7 +202,7 @@ def team(team_id):
     return render_template('team.html', team=team, active="team")
 
 
-@app.route('/guild/<uuid:guild_id>/')
+@app.route('/guild/<string:guild_id>/')
 def guild(guild_id):
     guild = db.session.query(Guild).get(guild_id)
     if not guild:
@@ -216,7 +216,7 @@ def guilds():
     return render_template('guilds.html', guilds=guilds, active="guild")
 
 
-@app.route('/match/<uuid:match_id>/')
+@app.route('/match/<string:match_id>/')
 def match(match_id):
     match = db.session.query(Match).get(match_id)
     if not match:
