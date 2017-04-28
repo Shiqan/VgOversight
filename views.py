@@ -240,28 +240,10 @@ def test():
 
     # request_data.query_team("cca544dd-8fb9-4640-97fa-d20aee017639")
 
-    team = db.session.query(Guild).filter_by(tag="FT").one()
+    team = db.session.query(Team).filter_by(tag="FT").one()
     db.session.delete(team)
 
-    print("Query #1" + time.strftime("%Y-%m-%dT%H:%M%SZ"))
-    player = request_data.query_player("DaZac", "eu")
-    add_player = Player(id=player['id'], name=player['attributes']['name'], shardId="eu",
-                        lifetimeGold=player['attributes']['stats']['lifetimeGold'],
-                        lossStreak=player['attributes']['stats']['lossStreak'],
-                        winStreak=player['attributes']['stats']['winStreak'],
-                        played=player['attributes']['stats']['played'],
-                        played_ranked=player['attributes']['stats']['played_ranked'],
-                        wins=player['attributes']['stats']['wins'],
-                        xp=player['attributes']['stats']['xp'])
-    add_player.team_id = test.id
-    try:
-        db.session.add(add_player)
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
-
-    print("Query #2" + time.strftime("%Y-%m-%dT%H:%M%SZ"))
+    print("Query #1 " + time.strftime("%Y-%m-%dT%H:%M%SZ"))
     player = request_data.query_player("Nyria", "eu")
     add_player = Player(id=player['id'], name=player['attributes']['name'], shardId="eu",
                         lifetimeGold=player['attributes']['stats']['lifetimeGold'],
