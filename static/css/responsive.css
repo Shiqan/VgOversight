@@ -337,7 +337,7 @@
 	#logo {
 		display: block;
 		height: 100px;
-		float: none;
+		/* float: none; */
 		margin: 0 auto 0 !important;
 		max-width: none;
 		text-align: center;
