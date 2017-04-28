@@ -253,7 +253,7 @@ def test():
                         played_ranked=player['attributes']['stats']['played_ranked'],
                         wins=player['attributes']['stats']['wins'],
                         xp=player['attributes']['stats']['xp'])
-    add_player.team_id = test.id
+    add_player.team_id = player.id
     try:
         db.session.add(add_player)
         db.session.commit()
