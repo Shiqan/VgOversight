@@ -193,7 +193,7 @@ def teams():
     return render_template('teams.html', teams=teams, active="team")
 
 
-@app.route('/team/<uuid:team_id>/')
+@app.route('/team/<string:team_id>/')
 def team(team_id):
     team = db.session.query(Team).get(team_id)
     if not team:
