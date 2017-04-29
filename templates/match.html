@@ -2,6 +2,16 @@
 {% set light = true %}
 {% set disable_transparent_header = true %}
 {% block title %} Match {% endblock %}
+{% block head %}
+<style>
+    h4 span { color: #ffffff !important; }
+    .match_result_win li { border-left: 4px solid #d6e9c6 !important; }
+    .match_result_lost li {  border-left: 4px solid #ebccd1 !important; }
+    #external-profiles img { width: auto; height: 24px; }
+    .plebs { background-color: #eee; opacity: 0.5; }
+
+</style>
+{% endblock %}
 {% block content %}
 <!-- Page Title
 ============================================= -->
@@ -12,6 +22,7 @@
     <div class="container clearfix">
         <h1>Match</h1>
         <span>{{ match.id }}</span>
+        <span>{{ match.createdAt }}</span>
     </div>
 
 </section>
@@ -27,25 +38,124 @@
             <div id="overview" class="row">
                 <div class="heading-block">
                     <h2>Overview</h2>
-                    {{ match.duration }}
-                    {{ match.createdAt }}
-                    {{ match.gameMode }}
-                    {{ match.endGameReason }}
+                </div>
+
+                <div class="col-md-3 col-sm-6 nobottommargin">
+                    <div class="feature-box fbox-center fbox-effect">
+                        <div class="fbox-icon">
+                            <a> <i>{{ match.duration | convert_game_time }}</i></a>
+                        </div>
+                        <h3>Duration</h3>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 nobottommargin">
+                    <div class="feature-box fbox-center fbox-effect">
+                        <div class="fbox-icon">
+                            <a> <i>{{ match.gameMode | title }}</i></a>
+                        </div>
+                        <h3>Game Mode</h3>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12 nobottommargin">
+                    <div id="external-profiles" class="list-group">
+                        <a href="http://vgpro.gg/players/{{current_user.shardId}}/{{current_user}}" target="_blank" class="plebs list-group-item clearfix">Vgpro.gg <img src="https://vgpro.gg/assets/images/logo_smaller.png" class="pull-right"/> </a>
+                        <a href="https://vain.gg/{{current_user.shardId}}/{{current_user}}" target="_blank" class="list-group-item clearfix">Vain.gg <img src="https://images.vain.gg/images/logo/nav-logo.png" class="pull-right"/></a>
+                        <a href="http://www.vgminer.com/DataMine/PlayerData?playerName={{current_player}}&region={{current_user.shardId}}" target="_blank" class="plebs list-group-item clearfix">VgMiner <img src="https://pbs.twimg.com/profile_images/855079047881162752/f0l_CSBH_400x400.jpg" class="pull-right"/> </a>
+                        <a href="https://vainsocial.com/player/{{current_user}}/match/{{match.id}}" target="_blank" class="list-group-item clearfix">VainSocial <img src="https://pbs.twimg.com/profile_images/838757996054208514/3Fic1_R8_400x400.jpg" class="pull-right"/> </a>
+                        <a href="https://mastervainglory.com/matches/{{match.shardId}}/{{match.id}} " target="_blank" class="list-group-item clearfix">Master Vainglory <img src="https://mastervainglory.com/asset/image/logo-mini-light.png" class="pull-right"/></a>
+                        <a href="https://vgu.herokuapp.com/analysis.html?ign={{current_user}}&shard={{current_user.shardId}}&match={{match.id}}" target="_blank" class="list-group-item clearfix">Vainglory University <img src="https://vgu.herokuapp.com/images/vgu-logo-large.png" class="pull-right"/></a>
+                    </div>
                 </div>
             </div>
 
             <div id="members" class="row">
                 <div class="heading-block">
-                    <h2>Members</h2>
+                    <h2>Players</h2>
                 </div>
-                {% for hero, p in match.left.heroes %}
-                <img src="/static/img/heroes/{{hero | hero_to_img }}" class="img-circle" data-toggle="tooltip"
-                     title="{{p}}" width="40px;"/>
-                {% endfor %}
-                {% for hero, p in match.right.heroes %}
-                <img src="/static/img/heroes/{{hero | hero_to_img }}" class="img-circle" data-toggle="tooltip"
-                     title="{{p}}" width="40px;"/>
-                {% endfor %}
+                <div class="col-md-6 col-xs-12">
+                    <h4>Left/Blue side
+                        {%- if match.left.team_id %}
+                            <span class="label label-info" style="text-decoration: underline overline;">{{ match.left.team_id | convert_team_id }}</span>
+                        {% endif -%}
+                        {%- if match.left.guild_id %}
+                            <span class="label label-primary">[{{ match.left.guild_id | convert_guild_id}}]</span>
+                        {% endif -%}
+                    </h4>
+                    <ol class="commentlist clearfix {% if match.left.winner %}match_result_win{% else %}match_result_lost{% endif %}">
+                        {% for p in match.left.participants %}
+                        <li class="comment even thread-even depth-1" id="li-comment-1">
+                            <div class="comment-wrap clearfix">
+
+                                <div class="comment-meta">
+                                    <div class="comment-author vcard">
+                                        <span class="comment-avatar clearfix">
+                                            <img src="/static/img/heroes/{{p.actor | hero_to_img }}" class="img-circle" data-toggle="tooltip" title="{{p.actor | convert_hero_name }}" width="60px;"/>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="comment-content clearfix">
+                                    <div class="comment-author"> {{ p.player }} <span><a href="/profile/{{p.player_id}}/" title="Link to player"> {{p.actor | convert_hero_name }}</a></span></div>
+                                    <p>
+                                        {% for item in p.items %}
+                                            <img src="/static/img/items/{{item | item_to_img}}" class="img-circle" data-toggle="tooltip" title="{{item}}" width="40px;"/>
+                                        {% endfor %}
+                                    </p>
+                                    <div class="review-comment-ratings">
+                                        {{ p.kills }} / {{ p.deaths }} / {{ p.assists }}
+                                    </div>
+                                </div>
+
+                                <div class="clear"></div>
+
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="col-md-6 col-xs-12">
+                    <h4>Right/Red side
+                        {%- if match.right.team_id %}
+                            <span class="label label-info" style="text-decoration: underline overline;">{{ match.right.team_id | convert_team_id }}</span>
+                        {% endif -%}
+                        {%- if match.right.guild_id %}
+                            <span class="label label-primary">[{{ match.right.guild_id | convert_guild_id}}]</span>
+                        {% endif -%}
+                    </h4>
+
+                    <ol class="commentlist clearfix {% if match.right.winner %}match_result_win{% else %}match_result_lost{% endif %}">
+                        {% for p in match.right.participants %}
+                        <li class="comment even thread-even depth-1">
+                            <div class="comment-wrap clearfix">
+
+                                <div class="comment-meta">
+                                    <div class="comment-author vcard">
+                                        <span class="comment-avatar clearfix">
+                                            <img src="/static/img/heroes/{{p.actor | hero_to_img }}" class="img-circle" data-toggle="tooltip" title="{{p.actor | convert_hero_name }}" width="60px;"/>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="comment-content clearfix">
+                                    <div class="comment-author"> {{ p.player }} <span><a href="/profile/{{p.player_id}}/" title="Link to player"> {{p.actor | convert_hero_name }}</a></span></div>
+                                    <p>
+                                        {% for item in p.items %}
+                                            <img src="/static/img/items/{{item | item_to_img}}" class="img-circle" data-toggle="tooltip" title="{{item}}" width="40px;"/>
+                                        {% endfor %}
+                                    </p>
+                                    <div class="review-comment-ratings">
+                                        {{ p.kills }} / {{ p.deaths }} / {{ p.assists }}
+                                    </div>
+                                </div>
+
+                                <div class="clear"></div>
+
+                            </div>
+                        </li>
+                        {% endfor %}
+
+                    </ol>
+                </div>
             </div>
 
         </div>

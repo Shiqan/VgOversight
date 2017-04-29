@@ -174,10 +174,11 @@
                                 <img src="/static/img/heroes/{{hero | hero_to_img }}" class="img-circle"
                                      data-toggle="tooltip" title="{{p}}" width="40px;"/>
                                 {% endfor %}
-                                {% if roster.match.left.team_id %} <span class="label label-info"
-                                                                         style="text-decoration: underline overline;">{{ roster.match.left.team_id | convert_team_id }}</span>
+                                {% if roster.match.left.team_id %}
+                                    <span class="label label-info"  style="text-decoration: underline overline;">{{ roster.match.left.team_id | convert_team_id }}</span>
                                 {% endif %}
-                                {% if roster.match.left.guild_id %} <span class="label label-primary">[{{ roster.match.left.guild_id | convert_guild_id}}]</span>
+                                {% if roster.match.left.guild_id %}
+                                    <span class="label label-primary">[{{ roster.match.left.guild_id | convert_guild_id}}]</span>
                                 {% endif %}
                             </td>
                             <td>

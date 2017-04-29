@@ -23,6 +23,11 @@ def hero_to_img(id):
     return "{0}.png".format(strings.heroes[id].lower())
 
 
+@app.template_filter('item_to_img')
+def item_to_img(item):
+    return "{0}.png".format(item.lower().replace(" ", "-").replace('\'', ''))
+
+
 @app.template_filter('convert_team_id')
 def id_to_team(id):
     return db.session.query(Team).get(id)
