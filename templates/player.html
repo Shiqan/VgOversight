@@ -165,8 +165,8 @@
                         <h4>Recent Games</h4>
                     </div>
 
-                    {% for game in player.participated[-5:] %}
-                        <a href="/match/{{game.roster.match.id}}/" class="social-icon {% if game.winner %}si-spotify{% else %}si-youtube{% endif %} si-small si-rounded si-colored" title="Facebook">
+                    {% for game in player.participated[:5] %}
+                        <a href="/match/{{game.roster.match.id}}/" class="social-icon {% if game.winner %}si-spotify{% else %}si-youtube{% endif %} si-small si-rounded si-colored" title="{{ game.createdAt }}">
                             <i class="icon-circle"></i>
                             <i class="icon-circle"></i>
                         </a>
