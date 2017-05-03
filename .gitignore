@@ -1,4 +1,4 @@
 *.pyc
 __pycache__
-migrations/versions/
+migrations/versions/*.py
 .idea/
