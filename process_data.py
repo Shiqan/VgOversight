@@ -32,6 +32,7 @@ def process_batch_query(matches):
 
         if team_roster or guild_roster:
             process_match(match)
+            createdAt = datetime.datetime.strptime(match['attributes']['createdAt'], '%Y-%m-%dT%H:%M:%SZ')
 
             for roster in match['relationships']['rosters']['data']:
                 roster_data = [i for i in matches['included'] if i['id'] == roster['id']]
@@ -54,7 +55,7 @@ def process_batch_query(matches):
                                    i['id'] == participant_data[0]['relationships']['player']['data']['id']]
                     assert len(player_data) == 1
                     process_player(player_data[0])
-                    process_participant(participant_data[0], roster['id'])
+                    process_participant(participant_data[0], roster['id'], createdAt=createdAt)
 
 
 def process_match(data):
@@ -104,7 +105,7 @@ def process_roster(data, match_id, team_id=None, guild_id=None):
             app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
 
 
-def process_participant(data, roster_id):
+def process_participant(data, roster_id, createdAt=None):
     test = db.session.query(Participant).get(data['id'])
     if not test:
         p = Participant(id=data['id'], roster_id=roster_id,
@@ -132,7 +133,8 @@ def process_participant(data, roster_id):
                         karmaLevel=data['attributes']['stats']['karmaLevel'],
                         level=data['attributes']['stats']['level'],
                         skillTier=data['attributes']['stats']['skillTier'])
-
+        if createdAt:
+            p.createdAt = createdAt
         db.session.add(p)
 
         try:

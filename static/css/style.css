@@ -218,6 +218,49 @@ small { font-family: 'Lato', sans-serif; }
 
 
 /* ----------------------------------------------------------------
+	Typeahead
+-----------------------------------------------------------------*/
+ h4 button.mfp-close {
+    background-color: black;
+    font-size: 21px;
+}
+
+span.twitter-typeahead { display: block !important; }
+.tt-menu {
+    width: 100%;
+    margin: 4px 0;
+    padding: 8px 0;
+    background-color: #FFF;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+    -webkit-box-shadow: 0 1px 10px rgba(0,0,0,.1);
+     -moz-box-shadow: 0 1px 10px rgba(0,0,0,.1);
+          box-shadow: 0 1px 10px rgba(0,0,0,.1);
+
+}
+
+.tt-suggestion {
+    padding: 3px 20px;
+    font-size: 15px;
+    line-height: 24px;
+}
+
+.tt-suggestion:hover {
+    cursor: pointer;
+    color: #FFF;
+    background-color: #1ABC9C;
+}
+
+.tt-suggestion.tt-cursor {
+    color: #fff;
+    background-color: #1ABC9C;
+
+}
+
+
+/* ----------------------------------------------------------------
 	Helper Classes
 -----------------------------------------------------------------*/
 

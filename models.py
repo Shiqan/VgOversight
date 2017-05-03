@@ -14,32 +14,55 @@ class Elo(db.Model):
     guild_id = db.Column(db.String(128), db.ForeignKey("guild.id"))
 
 
-class Challenge(db.Model):
-    __tablename__ = "challenge"
+class TeamChallenge(db.Model):
+    __tablename__ = "team_challenge"
 
     id = db.Column(db.String(128), primary_key=True)
     team1_id = db.Column(db.String(128), db.ForeignKey("team.id"))
     team2_id = db.Column(db.String(128), db.ForeignKey("team.id"))
 
-    team1 = db.relationship("Team", foreign_keys=[team1_id])
-    team2 = db.relationship("Team", foreign_keys=[team2_id])
+    mode = db.Column(db.String(128))
+    start = db.Column(db.DateTime, default=func.now())
+    end = db.Column(db.DateTime, default=func.now())
 
-    _matches = db.relationship("Roster", primaryjoin="or_(Roster.team_id==Challenge.team1_id, Roster.team_id==Challenge.team2_id)", foreign_keys="[Roster.team_id]")
+    _team1 = db.relationship("Team", foreign_keys=[team1_id])
+    _team2 = db.relationship("Team", foreign_keys=[team2_id])
+    _matches = db.relationship("Roster", primaryjoin="or_(Roster.team_id==TeamChallenge.team1_id, Roster.team_id==TeamChallenge.team2_id)", foreign_keys="[Roster.team_id]")
+
+class GuildChallenge(db.Model):
+    __tablename__ = "guild_challenge"
+
+    id = db.Column(db.String(128), primary_key=True)
+    guild1_id = db.Column(db.String(128), db.ForeignKey("guild.id"))
+    guild2_id = db.Column(db.String(128), db.ForeignKey("guild.id"))
+
+    mode = db.Column(db.String(128))
+    start = db.Column(db.DateTime, default=func.now())
+    end = db.Column(db.DateTime, default=func.now())
+
+    _guild1 = db.relationship("Guild", foreign_keys=[guild1_id])
+    _guild2 = db.relationship("Guild", foreign_keys=[guild2_id])
+    _matches = db.relationship("Roster", primaryjoin="or_(Roster.guild_id==GuildChallenge.guild1_id, Roster.guild_id==GuildChallenge.guild2_id)", foreign_keys="[Roster.guild_id]")
 
 
 class Team(db.Model):
     __tablename__ = "team"
 
     id = db.Column(db.String(128), primary_key=True)
+    captain = db.Column(db.String(128), db.ForeignKey("player.id"))
+    officer = db.Column(db.String(128), db.ForeignKey("player.id"))
+
     name = db.Column(db.String(128))
     tag = db.Column(db.String(128))
     description = db.Column(db.String(128))
     shardId = db.Column(db.String(128))
 
-    _captain = db.relationship("Player", uselist=False, backref="team_captain")
-    _members = db.relationship("Player", backref="team")
+    _captain = db.relationship("Player", backref="team_captain", uselist=False, primaryjoin="Team.captain==Player.id", foreign_keys="[Player.id]")
+    _officer = db.relationship("Player", backref="team_officer", uselist=False, primaryjoin="Team.officer==Player.id", foreign_keys="[Player.id]")
+
+    _members = db.relationship("Player", backref="team", primaryjoin="Team.id==Player.team_id", foreign_keys="[Player.team_id]")
     _matches = db.relationship("Roster", primaryjoin="Roster.team_id==Team.id", foreign_keys="[Roster.team_id]")
-    _challenges = db.relationship("Challenge", primaryjoin="or_(Challenge.team1_id==Team.id, Challenge.team2_id==Team.id)")
+    _challenges = db.relationship("TeamChallenge", primaryjoin="or_(TeamChallenge.team1_id==Team.id, TeamChallenge.team2_id==Team.id)")
     _elo = db.relationship("Elo", backref="team")
 
     @hybrid_property
@@ -77,15 +100,20 @@ class Guild(db.Model):
     __tablename__ = "guild"
 
     id = db.Column(db.String(128), primary_key=True)
+    captain = db.Column(db.String(128), db.ForeignKey("player.id"))
+    officer = db.Column(db.String(128), db.ForeignKey("player.id"))
+
     name = db.Column(db.String(128))
     tag = db.Column(db.String(128))
     description = db.Column(db.String(128))
     shardId = db.Column(db.String(128))
 
-    _captain = db.relationship("Player", uselist=False, backref="guild_captain")
-    _officer = db.relationship("Player", uselist=False, backref="guild_officer")
-    _members = db.relationship("Player", backref="guild")
+    _captain = db.relationship("Player", backref="guild_captain", uselist=False, primaryjoin="Guild.captain==Player.id", foreign_keys="[Player.id]")
+    _officer = db.relationship("Player", backref="guild_officer", uselist=False, primaryjoin="Guild.officer==Player.id", foreign_keys="[Player.id]")
+
+    _members = db.relationship("Player", backref="guild", primaryjoin="Guild.id==Player.guild_id", foreign_keys="[Player.guild_id]")
     _matches = db.relationship("Roster", primaryjoin="Roster.guild_id==Guild.id", foreign_keys="[Roster.guild_id]")
+    _challenges = db.relationship("GuildChallenge", primaryjoin="or_(GuildChallenge.guild1_id==Guild.id, GuildChallenge.guild2_id==Guild.id)")
     _elo = db.relationship("Elo", backref="guild")
 
     @hybrid_property
@@ -167,6 +195,9 @@ class Roster(db.Model):
     team_api = db.Column(db.String(128))
 
     participants = db.relationship("Participant", backref="roster")
+
+    _team = db.relationship("Team", backref="roster", uselist=False, primaryjoin="Roster.team_id==Team.id", foreign_keys="[Team.id]")
+    _guild = db.relationship("Guild", backref="roster", uselist=False, primaryjoin="Roster.guild_id==Guild.id", foreign_keys="[Guild.id]")
 
     @hybrid_property
     def winner(self):

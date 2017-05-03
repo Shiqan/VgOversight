@@ -29,6 +29,7 @@
             <div class="col-md-6">
                 <h1> {{ team }}</h1>
                 <span>{{ team.tag }} </span>
+                <span> {{ team._captain }} | {{ team._officer }} </span>
             </div>
             <div class="col-md-6">
                 <img class="pull-right" src="/static/img/skilltiers/{{team.skillTier}}.png" alt="Average skilltier"
@@ -53,6 +54,9 @@
                 <ul id="submenu">
                     <li class="current"><a href="#" data-scrollto="#overview">
                         <div>Overview</div>
+                    </a></li>
+                    <li><a href="#" data-scrollto="#challenges">
+                        <div>Challenges</div>
                     </a></li>
                     <li><a href="#" data-scrollto="#members">
                         <div>Members</div>
@@ -122,6 +126,39 @@
                 </div>
             </div>
 
+            <div id="challenges" class="row">
+                <div class="heading-block">
+                    <h2>Challenges
+
+                    {% if current_user.id == team.captain or current_user.id == team.officer %}
+                        <a href="#challenge" class="button button-3d button-large pull-right" data-lightbox="inline">Challenge</a>
+                    {% endif %}</h2>
+                </div>
+
+                {% if team._challenges | count > 0 %}
+                    {% for challenge in team._challenges %}
+                        <div class="col-md-4 col-sm-6 ool-xs-12 nobottommargin">
+
+                            <div class="panel panel-default events-meta">
+                                <div class="panel-body">
+                                    <ul class="portfolio-meta nobottommargin">
+                                        <li><span><i class="icon-user"></i>Created by:</span> <a href="/team/{{challenge.team1_id}}/">{{ challenge._team1 }}</a></li>
+                                        <li><span><i class="icon-link"></i>Opponent:</span> <a href="/team/{{challenge.team2_id}}/">{{ challenge._team2 }}</a></li>
+                                        <li><span><i class="icon-calendar3"></i>Started on:</span> {{ challenge.start }}</li>
+                                        <li><span><i class="icon-calendar3"></i>Completed on:</span> {{ challenge.end }}</li>
+                                        <li><span><i class="icon-lightbulb"></i>Mode:</span> {{ challenge.mode }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-xs-12 nobottommargin text-center">
+                        <h3> This {{ active }} has no challenges yet! </h3>
+                    </div>
+                {% endif %}
+            </div>
+
             <div id="members" class="row">
                 <div class="heading-block">
                     <h2>Members</h2>
@@ -175,7 +212,7 @@
                                      data-toggle="tooltip" title="{{p}}" width="40px;"/>
                                 {% endfor %}
                                 {% if roster.match.left.team_id %}
-                                    <span class="label label-info"  style="text-decoration: underline overline;">{{ roster.match.left.team_id | convert_team_id }}</span>
+                                    <span class="label label-info"  style="text-decoration: underline overline;">{{ roster.match.left._team }}</span>
                                 {% endif %}
                                 {% if roster.match.left.guild_id %}
                                     <span class="label label-primary">[{{ roster.match.left.guild_id | convert_guild_id}}]</span>
@@ -183,13 +220,13 @@
                             </td>
                             <td>
                                 {% for hero, p in roster.match.right.heroes %}
-                                <img src="/static/img/heroes/{{hero | hero_to_img }}" class="img-circle"
-                                     data-toggle="tooltip" title="{{p}}" width="40px;"/>
+                                    <img src="/static/img/heroes/{{hero | hero_to_img }}" class="img-circle" data-toggle="tooltip" title="{{p}}" width="40px;"/>
                                 {% endfor %}
-                                {% if roster.match.right.team_id %} <span class="label label-info"
-                                                                          style="text-decoration: underline overline;">{{ roster.match.right.team_id | convert_team_id }}</span>
+                                {% if roster.match.right.team_id %}
+                                    <span class="label label-info" style="text-decoration: underline overline;">{{ roster.match.right.team_id | convert_team_id }}</span>
                                 {% endif %}
-                                {% if roster.match.right.guild_id %} <span class="label label-primary">[{{ roster.match.right.guild_id | convert_guild_id}}]</span>
+                                {% if roster.match.right.guild_id %}
+                                    <span class="label label-primary">[{{ roster.match.right.guild_id | convert_guild_id}}]</span>
                                 {% endif %}
                             </td>
                             <td> {{ roster.match.duration | convert_game_time }}</td>
@@ -208,12 +245,58 @@
     </div>
 
 </section><!-- #content end -->
+
+<!-- Modal -->
+<div class="modal1 mfp-hide" id="challenge">
+    <div class="block divcenter" style="background-color: #FFF; max-width: 700px;">
+        <div class="row nomargin clearfix">
+            <div class="col-sm-6" data-height-lg="456" data-height-md="456" data-height-sm="456" data-height-xs="0"
+                 data-height-xxs="0"
+                 style="background-image: url('/static/images/theacadamy_by_noxiihunter-d86aems.jpg'); background-size: cover;"></div>
+            <div class="col-sm-6 col-padding" data-height-lg="456" data-height-md="456" data-height-sm="456"
+                 data-height-xs="456" data-height-xxs="456">
+                <div>
+                    <h4 class="uppercase ls1">Challenge {{ active }}
+                        <button title="Close (Esc)" type="button" class="mfp-close" aria-hidden="true">×</button>
+                    </h4>
+
+                    <form action="#" id="challenge-form" name="challenge-form" class="clearfix" style="max-width: 300px;">
+                        <div class="col_full">
+                            <input id="typeaheadBox" type="text" name="challenge-form-name" value="" class="sm-form-control"/>
+                            <input type="text" name="challenge-form-type" value="{{ active }}" hidden/>
+                            <input type="text" name="challenge-form-current" value="{{ team.id }}" hidden/>
+                        </div>
+                        <div class="col_full">
+                                <label for="challenge-form-mode">Game mode:</label>
+                                <select id="challenge-form-mode" name="challenge-form-mode"
+                                        class="selectpicker form-control">
+                                    <option value="private_party_draft_match">Private Draft</option>
+                                    <option value="private">Private Blind </option>
+                                    <option value="private_party_blitz_match">Private Blitz</option>
+                                    <option value="private_party_aral_match">Private Battle Royale</option>
+                                </select>
+                            </div>
+                        <div class="col_full nobottommargin">
+                            <button id="challenge-form-submit" type="button" class="button button-rounded button-small button-dark nomargin" value="submit">
+                                Challenge
+                            </button>
+                            <button type="button" class="button button-3d button-black nomargin button-loading" id="challenge-form-submit-wait" style="display: none;">
+                                <i class="icon-repeat"></i> Loading
+                            </button>
+                        </div>
+
+                        <div id="challenge-form-msg" class="col_full nobottommargin"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block js %}
-<!-- Bootstrap Data Table Plugin -->
 <script type="text/javascript" src="/static/js/bs-datatable.js"></script>
-
+<script type="text/javascript" src="/static/js/typehead.js"></script>
 <script>
 $(function() {
     $(document).on("scroll", onScroll);
@@ -223,10 +306,70 @@ $(function() {
 		"order": [[ 3, "desc" ]]
     });
 
-    $("#match_datatable tbody tr, #member_datatable tbody tr").click(function() {
-		window.location.href = $(this).data( "url" );
-	});
+	$('#match_datatable tbody, #member_datatable tbody').on('click', 'tr', function () {
+	    window.location.href = $(this).data('url');
+    } );
+
+    var teams = [ {% for team in teams %} "{{ team }}" {% if not loop.last %},{% endif%} {% endfor %}];
+
+    $('#typeaheadBox').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+    },
+    {
+        name: 'teams',
+        source: substringMatcher(teams)
+    });
+
+     $('#challenge-form-submit').click(function() {
+    	$("#challenge-form-submit").hide();
+    	$("#challenge-form-wait").show();
+
+        $.ajax({
+            url: '/ajax_challenge/',
+            data: $('#challenge-form').serialize(),
+            type: 'POST',
+            success: function(response) {
+            	error = response['error'];
+            	console.log(error);
+            	if (error) {
+            		$("#challenge-form-msg").html('<strong> Sorry. </strong>' + error);
+            		$("#challenge-form-msg").slideDown();
+            	} else {
+                	$("#challenge-form-msg").html('<strong> Challenge successful. </strong>');
+                }
+                $("#challenge-form-submit").show();
+    			$("#challenge-form-submit-wait").hide();
+            },
+            error: function(error) {
+                $("#challenge-form-msg").html("<strong> Sorry. </strong> Something went wrong, please try again another time!").slideDown();
+            }
+        });
+    });
 });
+
+var substringMatcher = function(strs) {
+    return function findMatches(q, cb) {
+    var matches, substringRegex;
+
+    // an array that will be populated with substring matches
+    matches = [];
+
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        matches.push(str);
+      }
+    });
+
+    cb(matches);
+    };
+};
 
 function onScroll(event){
     var scrollPos = $(document).scrollTop();

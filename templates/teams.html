@@ -19,7 +19,7 @@
     <div class="container clearfix">
         <div class="row">
             <div class="col-md-6">
-                <h1> Teams </h1>
+                <h1> {{ title }} </h1>
                 <span> Overview </span>
             </div>
         </div>
@@ -48,21 +48,17 @@
                     </thead>
                     <tbody>
                     {% for team in teams %}
-                    <tr data-url="/team/{{team.id}}/">
+                    <tr data-url="/{{ active }}/{{team.id}}/">
                         <td> {{ team }}</td>
                         <td> {{ team.tag }}</td>
                         <td> {{ team._matches | count }}</td>
                         <td> {{ '%0.2f'| format(team.winrate) }}%</td>
                         <td> {{ team._members | count }}</td>
-                        <td><span class="skilltier"> {{team.skillTier}} </span> <img class="pull-right"
-                                                                                     src="/static/img/skilltiers/{{team.skillTier}}.png"
-                                                                                     alt="team's skilltier"
-                                                                                     width="25px"/></td>
+                        <td><span class="skilltier"> {{team.skillTier}} </span> <img class="pull-right" src="/static/img/skilltiers/{{team.skillTier}}.png" alt="team's skilltier" width="25px"/></td>
                     </tr>
                     {% endfor %}
                     </tbody>
                 </table>
-                <div style="height: 2000px;"></div>
             </div>
 
         </div>
@@ -79,9 +75,9 @@
 $(function() {
     $('#team_datatable').dataTable();
 
-    $("#team_datatable tbody tr").click(function() {
-		window.location.href = $(this).data( "url" );
-	});
+	$('#team_datatable tbody').on('click', 'tr', function () {
+	    window.location.href = $(this).data('url');
+    } );
 });
 
 

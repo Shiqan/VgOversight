@@ -19,48 +19,6 @@
         color: #777;
         font-size: 20px;
     }
-
-    h4 button.mfp-close {
-        background-color: black;
-        font-size: 21px;
-    }
-
-
-		span.twitter-typeahead { display: block !important; }
-
-		.tt-menu {
-			width: 100%;
-			margin: 4px 0;
-			padding: 8px 0;
-			background-color: #FFF;
-			border: 1px solid rgba(0, 0, 0, 0.2);
-			-webkit-border-radius: 4px;
-			 -moz-border-radius: 4px;
-				  border-radius: 4px;
-			-webkit-box-shadow: 0 1px 10px rgba(0,0,0,.1);
-			 -moz-box-shadow: 0 1px 10px rgba(0,0,0,.1);
-				  box-shadow: 0 1px 10px rgba(0,0,0,.1);
-
-		}
-
-		.tt-suggestion {
-			padding: 3px 20px;
-			font-size: 15px;
-			line-height: 24px;
-		}
-
-		.tt-suggestion:hover {
-			cursor: pointer;
-			color: #FFF;
-			background-color: #0097cf;
-		}
-
-		.tt-suggestion.tt-cursor {
-			color: #fff;
-			background-color: #0097cf;
-
-		}
-
 </style>
 {% endblock %}
 {% block content %}
@@ -147,8 +105,8 @@
                           style="display: none;">
                         <input type="text" name="player_id" value="{{player.id}}" hidden/>
                     </form>
-                    <button id="update-player-stats" type="button"
-                            class="button button-rounded button-small button-dark nomargin" value="submit">Update
+                    <button id="update-player-stats" type="button" class="button button-rounded button-small button-dark nomargin" value="submit">
+                        Update
                     </button>
                     <button id="update-player-stats-wait" type="button"
                             class="button button-3d button-black nomargin button-loading" style="display: none;"><i
@@ -214,6 +172,8 @@
                                     class="icon-repeat"></i> Loading
                             </button>
                         </div>
+
+                        <div id="subscribe-form-guild-msg" class="col_full nobottommargin"></div>
                     </form>
                 </div>
             </div>
