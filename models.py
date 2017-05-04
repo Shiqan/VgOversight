@@ -25,6 +25,8 @@ class TeamChallenge(db.Model):
     start = db.Column(db.DateTime, default=func.now())
     end = db.Column(db.DateTime, default=func.now())
 
+    status = db.Column(db.String(32))
+
     _team1 = db.relationship("Team", foreign_keys=[team1_id])
     _team2 = db.relationship("Team", foreign_keys=[team2_id])
     _matches = db.relationship("Roster", primaryjoin="or_(Roster.team_id==TeamChallenge.team1_id, Roster.team_id==TeamChallenge.team2_id)", foreign_keys="[Roster.team_id]")
