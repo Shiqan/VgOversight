@@ -18,4 +18,5 @@ class DevelopmentConfig(Config):
         hostname="localhost:3306",
         databasename="vgmanager"
     )
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", None)
     CACHE_TYPE = "null"
