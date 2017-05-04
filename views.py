@@ -31,6 +31,38 @@ def login_required(f):
     return decorated_function
 
 
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    if request.method == "POST":
+        name = request.form['login-form-username']
+        region = request.form['login-form-region']
+        remember_me = 'remember' in request.form
+
+        registered_user = Player.query.filter_by(name=name).first()
+        if registered_user is None:
+            try:
+                player = request_data.query_player(name, region)
+            except (request_data.PlayerNotFound, HTTPError) as e:
+                flash(e.message)
+                return redirect(url_for('login'))
+
+            process_data.process_player(player, region=region)
+            registered_user = Player.query.filter_by(name=name).first()
+            if registered_user is None:
+                return redirect(url_for('login'))
+
+        login_user(registered_user, remember=remember_me)
+        return redirect(url_for('index'))
+
+    return render_template('login.html')
+
+
+@app.route('/logout/')
+def logout():
+    logout_user()
+    return render_template('login.html')
+
+
 @app.route('/')
 @app.route('/index/')
 def index():
@@ -60,7 +92,7 @@ def ajax_subscribe():
         error.append('Invalid name')
 
     if len(tag) < 2 or len(tag) > 4:
-        error.append('Invalid region')
+        error.append('Invalid tag')
 
     if not error:
         if type == 'team':
@@ -144,54 +176,6 @@ def ajax_update_player():
     return jsonify({'status': 200})
 
 
-@app.route('/login/', methods=['GET', 'POST'])
-def login():
-    if request.method == "POST":
-        name = request.form['login-form-username']
-        region = request.form['login-form-region']
-        remember_me = 'remember' in request.form
-
-        registered_user = Player.query.filter_by(name=name).first()
-        if registered_user is None:
-            try:
-                player = request_data.query_player(name, region)
-            except (request_data.PlayerNotFound, HTTPError) as e:
-                flash(e.message)
-                return redirect(url_for('login'))
-
-            add_player = Player(id=player['id'], name=player['attributes']['name'],
-                                shardId=region,
-                                lifetimeGold=player['attributes']['stats']['lifetimeGold'],
-                                lossStreak=player['attributes']['stats']['lossStreak'],
-                                winStreak=player['attributes']['stats']['winStreak'],
-                                played=player['attributes']['stats']['played'],
-                                played_ranked=player['attributes']['stats']['played_ranked'],
-                                wins=player['attributes']['stats']['wins'],
-                                xp=player['attributes']['stats']['xp'])
-
-            try:
-                db.session.add(add_player)
-                db.session.commit()
-            except SQLAlchemyError as e:
-                db.session.rollback()
-                app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
-                flash("Something went wrong, please try again later.")
-                return redirect(url_for('login'))
-
-            registered_user = Player.query.filter_by(name=name).first()
-
-        login_user(registered_user, remember=remember_me)
-        return redirect(url_for('index'))
-
-    return render_template('login.html')
-
-
-@app.route('/logout/')
-def logout():
-    logout_user()
-    return render_template('login.html')
-
-
 @app.route('/teams/')
 def teams():
     teams = db.session.query(Team).all()
@@ -221,8 +205,6 @@ def guild(guild_id):
 def guilds():
     guilds = db.session.query(Guild).all()
     return render_template('teams.html', teams=guilds, title="Guilds", active="guild")
-
-
 
 
 @app.route('/ajax_challenge/', methods=['POST'])
@@ -275,89 +257,10 @@ def test():
         request_data.threaded_process_range(2, chunk, "ranked")
         print("time.sleep(60)")
         time.sleep(60)
-
-    # request_data.query_team("cca544dd-8fb9-4640-97fa-d20aee017639")
-
-    # guild_id = db.session.query(Guild).filter_by(tag="FT").one()
-    # guild =  ["DaZac", "Nyria", "MarcoNewgate", "sugab", "farizhakim", "Kootiz", "Conchobhar", "XardaS",
-    #           "XSM1X", "WestSideTK", "R3zA", "krelian", "iTsKerim", "standart", "loyalkiller", "StormNeos", "time2party",
-    #           "salkoamok", "KanonMara", "GeTR3kT1337", "snowGhost", "TheBigBadWolf95", "shanlom", "MaestroTg",
-    #           "insomniax", "moaner", "Shiqan", "Madara420", "Globalkiller", "iNach", "yMadbro", "KaDJin", "SkullTune",
-    #           "CoOperPL", "TheWongDecision"]
-    # for member in guild:
-    #     player = db.session.query(Player).filter_by(name=member).first()
-    #     if player:
-    #         player.guild_id = guild_id.id
-    #         try:
-    #             db.session.commit()
-    #         except SQLAlchemyError as e:
-    #             db.session.rollback()
-    #             app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
-    # teams = [("Gauntlet","jdmn", ["loyalkiller", "snowGhost", "7DAD", "Ferxya", "moaner", "Lino95"]),
-    # ("TheBloodLine", "wBL",["KaDJin","leadena","BIAHOS","Setouph","Salamankka"]),
-    # ("partyharder","pH",["krelian","salkoamok","Conchobhar"]),
-    # ("Ash Beast","AshB",["DaZac","Madara420","CALLMEJESUS","GeTR3kT1337","TheWongDecision"]),
-    # ("Ja Gege","JGG",["sugab","farizhakim","R3zA"]),
-    # ("Bigby Wolf","BBW",["TheBigBadWolf95","MubarakWaleed","Globalkiller","VaLaK11","LightningCloud"]),
-    # ("NOO Regrets","NR",["ibrahimali12","KristinaEU","WestWorLd","insomniax","Girl83"]),
-    # ("Wanted Sultans", "WaSu", ["iUzername","WestSideTK","iTsKerim"]),
-    # ("WTW","TBT",["Kirushu","MrPoulet75","Hermes75","Firows"]),
-    # ("SickCr3w","Cr3w",["llEdokll","XSM1X","MarcoNewgate","Kootiz"]),
-    # ("Collossoss","SOS",["Zagataga","llsorall","shockwave09"]),
-    # ("InfernumOcularis","inoc",["standart","StormNeos","muroon"])]
-    #
-    # for team in teams:
-    #     test = db.session.query(Team).filter_by(name=team[0]).first()
-    #     if not test:
-    #         test = Team(id=uuid.uuid4(), name=team[0], tag=team[1], shardId="eu")
-    #
-    #         try:
-    #             db.session.add(test)
-    #             db.session.commit()
-    #         except SQLAlchemyError as e:
-    #             db.session.rollback()
-    #             app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
-    #
-    #     for member in team[2]:
-    #         player = db.session.query(Player).filter_by(name=member).first()
-    #         if not player:
-    #             try:
-    #                 player = request_data.query_player(member, "eu")
-    #             except (request_data.PlayerNotFound, HTTPError) as e:
-    #                 print(e)
-    #                 continue
-    #             add_player = Player(id=player['id'], name=player['attributes']['name'],
-    #                                 shardId="eu",
-    #                                 lifetimeGold=player['attributes']['stats']['lifetimeGold'],
-    #                                 lossStreak=player['attributes']['stats']['lossStreak'],
-    #                                 winStreak=player['attributes']['stats']['winStreak'],
-    #                                 played=player['attributes']['stats']['played'],
-    #                                 played_ranked=player['attributes']['stats']['played_ranked'],
-    #                                 wins=player['attributes']['stats']['wins'],
-    #                                 xp=player['attributes']['stats']['xp'])
-    #             add_player.team_id = test.id
-    #
-    #             try:
-    #                 db.session.add(add_player)
-    #                 db.session.commit()
-    #             except SQLAlchemyError as e:
-    #                 db.session.rollback()
-    #                 app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
-    #         else:
-    #             player.team_id = test.id
-    #
-    #             try:
-    #                 db.session.commit()
-    #             except SQLAlchemyError as e:
-    #                 db.session.rollback()
-    #                 app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
-    #     time.sleep(60)
+          
     return 'ok'
 
 
-# ------------------
-# ERROR HANDLERS
-# ------------------
 @app.errorhandler(400)
 def bad_request(e):
     return render_template('404.html'), 400

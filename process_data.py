@@ -33,6 +33,7 @@ def process_batch_query(matches):
         if team_roster or guild_roster:
             process_match(match)
             createdAt = datetime.datetime.strptime(match['attributes']['createdAt'], '%Y-%m-%dT%H:%M:%SZ')
+            shardId = data['attributes']['shardId']
 
             for roster in match['relationships']['rosters']['data']:
                 roster_data = [i for i in matches['included'] if i['id'] == roster['id']]
@@ -54,7 +55,7 @@ def process_batch_query(matches):
                     player_data = [i for i in matches['included'] if
                                    i['id'] == participant_data[0]['relationships']['player']['data']['id']]
                     assert len(player_data) == 1
-                    process_player(player_data[0])
+                    process_player(player_data[0], region=shardId)
                     process_participant(participant_data[0], roster['id'], createdAt=createdAt)
 
 
@@ -144,11 +145,12 @@ def process_participant(data, roster_id, createdAt=None):
             app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
 
 
-def process_player(data):
+def process_player(data, region="eu"):
     test = db.session.query(Player).get(data['id'])
     if not test:
 
         p = Player(id=data['id'], name=data['attributes']['name'],
+                   shardId=region,
                    lifetimeGold=data['attributes']['stats']['lifetimeGold'],
                    lossStreak=data['attributes']['stats']['lossStreak'],
                    winStreak=data['attributes']['stats']['winStreak'],
@@ -172,8 +174,6 @@ def process_player(data):
         test.played_ranked = data['attributes']['stats']['played_ranked']
         test.wins = data['attributes']['stats']['wins']
         test.xp = data['attributes']['stats']['xp']
-
-        db.session.commit()
 
         try:
             db.session.commit()
