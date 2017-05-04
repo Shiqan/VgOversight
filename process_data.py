@@ -33,7 +33,7 @@ def process_batch_query(matches):
         if team_roster or guild_roster:
             process_match(match)
             createdAt = datetime.datetime.strptime(match['attributes']['createdAt'], '%Y-%m-%dT%H:%M:%SZ')
-            shardId = data['attributes']['shardId']
+            shardId = match['attributes']['shardId']
 
             for roster in match['relationships']['rosters']['data']:
                 roster_data = [i for i in matches['included'] if i['id'] == roster['id']]
