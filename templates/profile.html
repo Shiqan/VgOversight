@@ -57,7 +57,7 @@
                                     <img src="/static/img/skilltiers/{{current_user.team.skillTier}}.png"
                                          class="avatar alignleft img-circle img-thumbnail notopmargin nobottommargin"
                                          alt="Avatar" style="max-width: 84px;">
-                                    <span class="text-name"> <strong>{{ current_user.team.name }}</strong> <br> {{ current_user.team.tag }} </span>
+                                    <span class="text-name"> <strong>{{ current_user.team.name }}</strong> <br> {{ current_user.team.tag }} <br> <a href="#leaveTeam" data-lightbox="inline"><i class="i-plain i-small icon-unlink"></i></a> </span>
                                 </a>
                                 {% else %}
                                 <a href="#joinTeam" class="button button-3d button-large" data-lightbox="inline">Join
@@ -74,7 +74,7 @@
                                     <img src="/static/img/skilltiers/{{current_user.guild.skillTier}}.png"
                                          class="avatar alignleft img-circle img-thumbnail notopmargin nobottommargin"
                                          alt="Avatar" style="max-width: 84px;">
-                                    <span class="text-name"> <strong>{{ current_user.guild.name }}</strong> <br> {{ current_user.guild.tag }} </span>
+                                    <span class="text-name"> <strong>{{ current_user.guild.name }}</strong> <br> {{ current_user.guild.tag }}  <br> <a href="#leaveTeam" data-lightbox="inline"><i class="i-plain i-small icon-unlink"></i></a></span>
                                 </a>
                                 {% else %}
                                 <a href="#joinGuild" class="button button-3d button-large" data-lightbox="inline">Join
@@ -103,7 +103,7 @@
                     </div>
                     <form action="#" id="update-player-form" name="update-player-form" class="clearfix"
                           style="display: none;">
-                        <input type="text" name="player_id" value="{{player.id}}" hidden/>
+                        <input type="text" name="player_id" value="{{current_user.id}}" hidden/>
                     </form>
                     <button id="update-player-stats" type="button" class="button button-rounded button-small button-dark nomargin" value="submit">
                         Update
@@ -217,6 +217,50 @@
         </div>
     </div>
 </div>
+<div class="modal1 mfp-hide" id="leaveGuild">
+    <div class="block divcenter" style="background-color: #FFF; max-width: 700px;">
+        <div class="row nomargin clearfix">
+            <div class="col-sm-6" data-height-lg="456" data-height-md="456" data-height-sm="456" data-height-xs="0"
+                 data-height-xxs="0"
+                 style="background-image: url('/static/images/halcyon_lore_by_noxiihunter-dam827l.jpg'); background-size: cover;"></div>
+            <div class="col-sm-6 col-padding" data-height-lg="456" data-height-md="456" data-height-sm="456"
+                 data-height-xs="456" data-height-xxs="456">
+                <div>
+                    <h4 class="uppercase ls1">Are you sure you want to leave your Guild?
+                        <button title="Close (Esc)" type="button" class="mfp-close" aria-hidden="true">×</button>
+                    </h4>
+                    <div class="col_full">
+                        <a href="/ajax_leave/guild/"><button title="Leave" type="button"  class="button button-rounded button-small button-dark nomargin">Yes</button></a>
+                        <button title="Cancel" class="button button-rounded button-small button-dark nomargin mfp-close-guild" type="button" aria-hidden="true">No</button>
+                    </div>
+                    <p class="nobottommargin"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal1 mfp-hide" id="leaveTeam">
+    <div class="block divcenter" style="background-color: #FFF; max-width: 700px;">
+        <div class="row nomargin clearfix">
+            <div class="col-sm-6" data-height-lg="456" data-height-md="456" data-height-sm="456" data-height-xs="0"
+                 data-height-xxs="0"
+                 style="background-image: url('/static/images/theacadamy_by_noxiihunter-d86aems.jpg'); background-size: cover;"></div>
+            <div class="col-sm-6 col-padding" data-height-lg="456" data-height-md="456" data-height-sm="456"
+                 data-height-xs="456" data-height-xxs="456">
+                <div>
+                    <h4 class="uppercase ls1">Are you sure you want to leave your Team?
+                        <button title="Close (Esc)" type="button" class="mfp-close" aria-hidden="true">×</button>
+                    </h4>
+                    <div class="col_full">
+                        <a href="/ajax_leave/team/"><button title="Leave" type="button"  class="button button-rounded button-small button-dark nomargin">Yes</button></a>
+                        <button title="Cancel" class="button button-rounded button-small button-dark nomargin mfp-close-team" type="button" aria-hidden="true">No</button>
+                    </div>
+                    <p class="nobottommargin"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block js %}
@@ -269,6 +313,15 @@ $('#typeaheadGuilds').typeahead({
 
 
 $(function() {
+    $('.mfp-close-guild').click(function() {
+        $('#leaveGuild').magnificPopup('close');
+    });
+    $('.mfp-close-team').click(function() {
+        $('#leaveTeam').magnificPopup('close');
+    });
+
+
+
     $('#subscribe-form-team-submit').click(function() {
     	$("#subscribe-form-team-submit").hide();
     	$("#subscribe-form-submit-team-wait").show();

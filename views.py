@@ -96,9 +96,9 @@ def ajax_subscribe():
 
     if not error:
         if type == 'team':
-            team = Team(id=uuid.uuid4(), name=name, tag=tag, shardId=region, description=description)
+            team = Team(id=uuid.uuid4(), name=name, tag=tag, shardId=region, description=description, captain=current_user.id)
         else:
-            team = Guild(id=uuid.uuid4(), name=name, tag=tag, shardId=region, description=description)
+            team = Guild(id=uuid.uuid4(), name=name, tag=tag, shardId=region, description=description, captain=current_user.id)
 
         try:
             db.session.add(team)
@@ -134,13 +134,29 @@ def ajax_join_group():
     return jsonify({'error': ', '.join(error)})
 
 
+@app.route('/ajax_leave/<string:group>/', methods=['GET'])
+def ajax_leave_group(group):
+    user = db.session.query(Player).get(current_user.id)
+    if group == 'team':
+        user.team_id = None
+    else:
+        user.guild_id = None
+
+    try:
+        db.session.commit()
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error('ERROR: Session rollback - reason "%s"' % str(e))
+
+    return redirect(url_for('profile'))
+
+
 @app.route('/profile/', methods=['GET'])
 @login_required
 def profile():
-    player = db.session.query(Player).get(current_user.id)
-    guilds = db.session.query(Guild).options(load_only("name")).all()
-    teams = db.session.query(Team).options(load_only("name")).all()
-    return render_template('profile.html', player=player, teams=teams, guilds=guilds)
+    guilds = db.session.query(Guild).options(load_only("name")).filter_by(shardId=current_user.shardId).all()
+    teams = db.session.query(Team).options(load_only("name")).filter_by(shardId=current_user.shardId).all()
+    return render_template('profile.html', teams=teams, guilds=guilds)
 
 
 @app.route('/profile/<string:player_id>/', methods=['GET'])
